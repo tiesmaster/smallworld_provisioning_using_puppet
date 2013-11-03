@@ -11,6 +11,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Every Vagrant virtual environment requires a box to build off of.
   config.vm.box = "precise32"
+  config.vm.provision :puppet
 
   # The url from where the 'config.vm.box' box will be fetched if it
   # doesn't already exist on the user's system.
