@@ -1,0 +1,67 @@
+From 59748f09e2248ffd99976f5378a6e1fa56819187 Mon Sep 17 00:00:00 2001
+From: Thijs Brobbel <thijsbrobbel@gmail.com>
+Date: Wed, 1 Aug 2012 12:59:18 +0200
+Subject: [PATCH] Fixes font problem on recent Linux environments.
+
+This removes the 'urw' font type foundry from the font pattern, to widen the
+amount of fonts that matches the pattern. The fonts by ghostscript, among
+others, matches this pattern. This can be installed on recent Ubuntu boxes
+using:
+
+  # apt-get install gsfonts-x11
+---
+ urw_helvetica |   12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/urw_helvetica b/urw_helvetica
+index b382951..77a0b4e 100644
+--- a/urw_helvetica
++++ b/urw_helvetica
+@@ -8,38 +8,38 @@ DEFINE doc_default
+         type: X
+         size: any
+         comprises:
+-                "-urw-helvetica-medium-r-normal--*-*-*-*-*-*-iso8859-1"
++                "-*-helvetica-medium-r-normal--*-*-*-*-*-*-iso8859-1"
+ 
+ DEFINE doc_heading
+ 	type: X
+ 	size: any
+ 	comprises: 
+-		"-urw-helvetica-bold-r-normal--*-*-*-*-*-*-iso8859-1"
++		"-*-helvetica-bold-r-normal--*-*-*-*-*-*-iso8859-1"
+ 
+ 
+ DEFINE doc_emphasis
+ 	type: X
+ 	size: any
+ 	comprises: 
+-		"-urw-helvetica-medium-o-normal--*-*-*-*-*-*-iso8859-1"
++		"-*-helvetica-medium-o-normal--*-*-*-*-*-*-iso8859-1"
+ 
+ DEFINE plain
+ 	type: X
+ 	size: scalable
+ 	comprises: 
+-		"-urw-helvetica-medium-r-normal--0-*-*-*-*-*-iso8859-1"
++		"-*-helvetica-medium-r-normal--*-*-*-*-*-*-iso8859-1"
+ 
+ 
+ DEFINE bold
+ 	type: X
+ 	size: scalable
+ 	comprises: 
+-		"-urw-helvetica-bold-r-normal--0-*-*-*-*-*-iso8859-1"
++		"-*-helvetica-bold-r-normal--*-*-*-*-*-*-iso8859-1"
+ 
+ 
+ DEFINE fancy
+ 	type: X
+ 	size: scalable
+ 	comprises: 
+-		"-urw-helvetica-medium-o-normal--0-*-*-*-*-*-iso8859-1"
++		"-*-helvetica-medium-o-normal--*-*-*-*-*-*-iso8859-1"
+ 
+-- 
+1.7.9.5
+

@@ -1,0 +1,42 @@
+virtualbox additions
+sudoers: add NOPASSWD: 
+sudo apt-get install csh vim-gtk tree curl git
+ln -s /usr/bin/arch /bin/arch
+echo 'set completion-ignore-case on' >.inputrc
+sudo useradd -m -s /bin/bash ties
+
+   9  apt-get install csh
+   16  apt-get install vim-tiny
+   20  apt-get install vim-tiny
+   45  sudo apt-get install git
+   51  sudo apt-get install curl
+  122  sudo apt-get install tree
+  160  sudo apt-get install gvim
+  161  sudo apt-get install vim-gtk
+
+
+sudo apt-get install libxaw3dxft6
+sudo ln -s libXaw3dxft.so.6 /usr/lib/libXaw3d.so.7
+apt-get install gsfonts-x11
+apply patch 0001-Fixes-font-problem-on-recent-Linux-environments.patch
+  or sed -i -e 's/urw/*/' -e 's/0/*/' urw_helvetica
+
+
+apt-get install ruby1.9.3 maven2 openjdk-6-jdk
+
+
+==> build_cam_db_closed_swaf.sh <==
+  . environment.sh
+  gis build_cam_db_closed_swaf
+
+==> build_cam_db_open_swaf.sh <==
+  . environment.sh
+  gis build_cam_db_open_swaf
+
+environment.sh
+  export PROJECT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+  export CAMBRIDGE_DB_DIR=/opt/smallworld/cambridge_db
+
+  export SW_GIS_ALIAS_FILES=${CAMBRIDGE_DB_DIR}/config/magik_images/resources/base/data/gis_aliases
+  export SW_SAVE_IMAGE_DIR=${PROJECT_DIR}/images
+  export LOG_DIR=${PROJECT_DIR}/log
