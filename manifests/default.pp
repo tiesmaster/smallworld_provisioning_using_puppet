@@ -33,3 +33,16 @@ exec { "install smallworld":
     Mount["$installation_mount"],
   ],
 }
+
+exec { "configure smallworld":
+  command   => "echo vagrant | $install_dir/GIS42/bin/share/gis_config -user",
+  provider  => shell,
+  try_sleep => 1,
+  require   => Exec["install smallworld"],
+}
+
+file { "$install_dir/GIS42/config/gis_aliases":
+  ensure  => link,
+  target  => "$install_dir/GIS42/config/magik_images/resources/base/data/gis_aliases",
+  require => Exec["install smallworld"],
+}
