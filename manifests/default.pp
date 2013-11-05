@@ -46,3 +46,10 @@ file { "$install_dir/GIS42/config/gis_aliases":
   target  => "$install_dir/GIS42/config/magik_images/resources/base/data/gis_aliases",
   require => Exec["install smallworld"],
 }
+
+exec { "test smallworld":
+  command   => "sudo -H -u vagrant sh -l -c 'gis -i gis'",
+  provider  => shell,
+  logoutput => true,
+  require   => File["$install_dir/GIS42/config/gis_aliases"],
+}
