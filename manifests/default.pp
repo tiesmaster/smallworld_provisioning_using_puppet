@@ -63,15 +63,12 @@ file { "${target_dir}/GIS42/config/gis_aliases":
 
 # runtime deps: sw_magik_motif
 
-package { "libxaw3dxft6":
-  ensure => installed,
-}
-
-package { "libxp6":
-  ensure => installed,
-}
-
-package { "gsfonts-x11":
+package { "dependent packages for sw_magik_motif":
+  name   => [
+    "libxaw3dxft6",
+    "libxp6",
+    "gsfonts-x11",
+  ],
   ensure => installed,
 }
 
