@@ -25,8 +25,8 @@ file { "/bin/arch":
   target => "/usr/bin/arch",
 }
 
-package { 'csh':
-  ensure => 'installed',
+package { "csh":
+  ensure => installed,
 }
 
 # install smallworld
@@ -63,21 +63,21 @@ file { "${target_dir}/GIS42/config/gis_aliases":
 
 # runtime deps: sw_magik_motif
 
-package { 'libxaw3dxft6':
-  ensure => 'installed',
+package { "libxaw3dxft6":
+  ensure => installed,
 }
 
-package { 'libxp6':
-  ensure => 'installed',
+package { "libxp6":
+  ensure => installed,
 }
 
-package { 'gsfonts-x11':
-  ensure => 'installed',
+package { "gsfonts-x11":
+  ensure => installed,
 }
 
-file { '/usr/lib/libXaw3d.so.7':
+file { "/usr/lib/libXaw3d.so.7":
   ensure => link,
-  target => '/usr/lib/libXaw3dxft.so.6',
+  target => "/usr/lib/libXaw3dxft.so.6",
 }
 
 exec { "patches font file":
