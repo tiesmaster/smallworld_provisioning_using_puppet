@@ -42,10 +42,13 @@ mount { "${install_source}":
   require => File["${install_source}"],
 }
 
-$install_opts = "-force_os_rev -platforms local -emacs no -owner ${target_user} -nolog"
+$install_dir = "-targetdir ${target_dir}"
+$install_features = "-force_os_rev -platforms local -emacs no -owner ${target_user}"
+$install_answer_file = "/vagrant/manifests/smallworld_install.answer_file"
+$install_opts = "${install_features} -nolog ${install_dir} < ${install_answer_file}"
 
 exec { "install smallworld":
-  command  => "${install_source}/product/install.sh ${install_opts} -targetdir ${target_dir} < /vagrant/manifests/smallworld_install.answer_file",
+  command  => "${install_source}/product/install.sh ${install_opts}",
   provider => shell,
   creates  => "${target_dir}",
   require => [
