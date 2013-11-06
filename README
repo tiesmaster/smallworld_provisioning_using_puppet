@@ -4,4 +4,3 @@ KNOWN ISSUES
 ============
 
  * installation media is not unmounted and prevents reboot
- * everything after the installation fails, since the task isn't finished after the exec task

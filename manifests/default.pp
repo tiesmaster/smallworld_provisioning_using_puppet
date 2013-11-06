@@ -42,8 +42,9 @@ mount { "$installation_mount":
 }
 
 exec { "install smallworld":
-  command => "$installation_mount/product/install.sh $install_opts -targetdir $install_dir",
-  creates => "$install_dir",
+  command  => "$installation_mount/product/install.sh $install_opts -targetdir $install_dir -nolog < /vagrant/manifests/smallworld_install.answer_file",
+  provider => shell,
+  creates  => "$install_dir",
   require => [
     File["/bin/arch"],
     Package["csh"],
@@ -54,7 +55,6 @@ exec { "install smallworld":
 exec { "configure smallworld":
   command   => "echo vagrant | $install_dir/GIS42/bin/share/gis_config -user",
   provider  => shell,
-  try_sleep => 1,
   require   => Exec["install smallworld"],
 }
 
