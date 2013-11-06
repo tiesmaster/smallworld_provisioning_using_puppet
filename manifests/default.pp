@@ -1,7 +1,8 @@
 $installation_mount = "/mnt/smallworld_install"
 $installation_iso_file = "/vagrant/install/CORE420_UNIX.iso"
 $target_dir = "/opt/smallworld"
-$install_opts = "-force_os_rev -platforms local -emacs no -owner vagrant"
+$target_user = "vagrant"
+$install_opts = "-force_os_rev -platforms local -emacs no -owner ${target_user}"
 
 file { "/bin/arch":
   ensure => link,
@@ -53,7 +54,7 @@ exec { "install smallworld":
 }
 
 exec { "configure smallworld":
-  command   => "echo vagrant | $target_dir/GIS42/bin/share/gis_config -user",
+  command   => "echo ${target_user} | $target_dir/GIS42/bin/share/gis_config -user",
   provider  => shell,
   require   => Exec["install smallworld"],
 }
@@ -71,7 +72,7 @@ file { "$target_dir/GIS42/config/gis_aliases":
 }
 
 exec { "test smallworld":
-  command   => "sudo -H -u vagrant sh -l -c 'gis -i gis'",
+  command   => "sudo -H -u ${target_user} sh -l -c 'gis -i gis'",
   provider  => shell,
   logoutput => true,
   require   => File["$target_dir/GIS42/config/gis_aliases"],
