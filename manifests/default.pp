@@ -1,8 +1,8 @@
 $installation_mount = "/mnt/smallworld_install"
 $installation_iso_file = "/vagrant/install/CORE420_UNIX.iso"
+
 $target_dir = "/opt/smallworld"
 $target_user = "vagrant"
-$install_opts = "-force_os_rev -platforms local -emacs no -owner ${target_user}"
 
 file { "/bin/arch":
   ensure => link,
@@ -30,44 +30,46 @@ file { '/usr/lib/libXaw3d.so.7':
   target => '/usr/lib/libXaw3dxft.so.6',
 }
 
-file { "$installation_mount":
+file { "${installation_mount}":
   ensure => directory,
 }
 
-mount { "$installation_mount":
+mount { "${installation_mount}":
   ensure  => mounted,
-  device  => "$installation_iso_file",
+  device  => "${installation_iso_file}",
   options => "loop,ro,noauto",
   fstype  => "iso9660",
-  require => File["$installation_mount"],
+  require => File["${installation_mount}"],
 }
 
+$install_opts = "-force_os_rev -platforms local -emacs no -owner ${target_user} -nolog"
+
 exec { "install smallworld":
-  command  => "$installation_mount/product/install.sh $install_opts -targetdir $target_dir -nolog < /vagrant/manifests/smallworld_install.answer_file",
+  command  => "${installation_mount}/product/install.sh ${install_opts} -targetdir ${target_dir} < /vagrant/manifests/smallworld_install.answer_file",
   provider => shell,
-  creates  => "$target_dir",
+  creates  => "${target_dir}",
   require => [
     File["/bin/arch"],
     Package["csh"],
-    Mount["$installation_mount"],
+    Mount["${installation_mount}"],
   ],
 }
 
 exec { "configure smallworld":
-  command   => "echo ${target_user} | $target_dir/GIS42/bin/share/gis_config -user",
+  command   => "echo ${target_user} | ${target_dir}/GIS42/bin/share/gis_config -user",
   provider  => shell,
   require   => Exec["install smallworld"],
 }
 
 exec { "patches font file":
-  command  => "sed -i -e 's/urw/*/' -e 's/0/*/' $target_dir/GIS42/config/font/urw_helvetica",
+  command  => "sed -i -e 's/urw/*/' -e 's/0/*/' ${target_dir}/GIS42/config/font/urw_helvetica",
   provider => shell,
   require  => Exec["install smallworld"],
 }
 
-file { "$target_dir/GIS42/config/gis_aliases":
+file { "${target_dir}/GIS42/config/gis_aliases":
   ensure  => link,
-  target  => "$target_dir/GIS42/config/magik_images/resources/base/data/gis_aliases",
+  target  => "${target_dir}/GIS42/config/magik_images/resources/base/data/gis_aliases",
   require => Exec["install smallworld"],
 }
 
@@ -75,7 +77,7 @@ exec { "test smallworld":
   command   => "sudo -H -u ${target_user} sh -l -c 'gis -i gis'",
   provider  => shell,
   logoutput => true,
-  require   => File["$target_dir/GIS42/config/gis_aliases"],
+  require   => File["${target_dir}/GIS42/config/gis_aliases"],
 }
 
 # gis -i -a /opt/smallworld/cambridge_db/config/magik_images/resources/base/data/gis_aliases build_cam_db_closed
