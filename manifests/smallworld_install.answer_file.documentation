@@ -3,3 +3,6 @@ Please enter a number between 0 and 4: [0]
 Will swmfs be run on this host? [yes]
 Do you have any product licences to register now? [yes]
 Please enter choice (1 to 10): [1]
+Enter the pathname from which to install the software:
+Are you sure you want to install this? [yes]
+Enter name of directory:

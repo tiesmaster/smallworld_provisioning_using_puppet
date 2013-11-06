@@ -4,3 +4,4 @@ KNOWN ISSUES
 ============
 
  * installation media is not unmounted and prevents reboot
+ * answer file to Smallworld installer contains full paths
