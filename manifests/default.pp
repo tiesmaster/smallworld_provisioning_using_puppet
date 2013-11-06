@@ -12,6 +12,23 @@ package { 'csh':
   ensure => 'installed',
 }
 
+package { 'libxaw3dxft6':
+  ensure => 'installed',
+}
+
+package { 'libxp6':
+  ensure => 'installed',
+}
+
+package { 'gsfonts-x11':
+  ensure => 'installed',
+}
+
+file { '/usr/lib/libXaw3d.so.7':
+  ensure => link,
+  target => '/usr/lib/libXaw3dxft.so.6',
+}
+
 file { "$installation_mount":
   ensure => directory,
 }
@@ -39,6 +56,12 @@ exec { "configure smallworld":
   provider  => shell,
   try_sleep => 1,
   require   => Exec["install smallworld"],
+}
+
+exec { "patches font file":
+  command  => "sed -i -e 's/urw/*/' -e 's/0/*/' $install_dir/GIS42/config/font/urw_helvetica",
+  provider => shell,
+  require  => Exec["install smallworld"],
 }
 
 file { "$install_dir/GIS42/config/gis_aliases":
