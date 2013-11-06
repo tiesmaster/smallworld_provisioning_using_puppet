@@ -19,7 +19,7 @@ sudo apt-get install libxaw3dxft6
 sudo ln -s libXaw3dxft.so.6 /usr/lib/libXaw3d.so.7
 apt-get install gsfonts-x11
 apply patch 0001-Fixes-font-problem-on-recent-Linux-environments.patch
-  or sed -i -e 's/urw/*/' -e 's/0/*/' urw_helvetica
+  or sed -i -e 's/urw/*/' -e 's/0/*/' $SMALLWORLD_GIS/config/font/urw_helvetica
 
 
 apt-get install ruby1.9.3 maven2 openjdk-6-jdk
