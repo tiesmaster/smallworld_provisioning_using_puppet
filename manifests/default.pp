@@ -36,7 +36,7 @@ file { "$installation_mount":
 mount { "$installation_mount":
   ensure  => mounted,
   device  => "$installation_iso_file",
-  options => "loop,ro",
+  options => "loop,ro,noauto",
   fstype  => "iso9660",
   require => File["$installation_mount"],
 }

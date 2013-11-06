@@ -3,5 +3,4 @@ This is a sample setup howto provision a new VM using Vagrant and setup Smallwor
 KNOWN ISSUES
 ============
 
- * installation media is not unmounted and prevents reboot
  * answer file to Smallworld installer contains full paths
