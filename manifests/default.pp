@@ -1,4 +1,4 @@
-$installation_mount = "/mnt/smallworld_install"
+$install_source = "/mnt/smallworld_install"
 $installation_iso_file = "/vagrant/install/CORE420_UNIX.iso"
 
 $target_dir = "/opt/smallworld"
@@ -30,28 +30,28 @@ file { '/usr/lib/libXaw3d.so.7':
   target => '/usr/lib/libXaw3dxft.so.6',
 }
 
-file { "${installation_mount}":
+file { "${install_source}":
   ensure => directory,
 }
 
-mount { "${installation_mount}":
+mount { "${install_source}":
   ensure  => mounted,
   device  => "${installation_iso_file}",
   options => "loop,ro,noauto",
   fstype  => "iso9660",
-  require => File["${installation_mount}"],
+  require => File["${install_source}"],
 }
 
 $install_opts = "-force_os_rev -platforms local -emacs no -owner ${target_user} -nolog"
 
 exec { "install smallworld":
-  command  => "${installation_mount}/product/install.sh ${install_opts} -targetdir ${target_dir} < /vagrant/manifests/smallworld_install.answer_file",
+  command  => "${install_source}/product/install.sh ${install_opts} -targetdir ${target_dir} < /vagrant/manifests/smallworld_install.answer_file",
   provider => shell,
   creates  => "${target_dir}",
   require => [
     File["/bin/arch"],
     Package["csh"],
-    Mount["${installation_mount}"],
+    Mount["${install_source}"],
   ],
 }
 
