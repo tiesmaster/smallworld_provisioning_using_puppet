@@ -14,7 +14,7 @@ class smallworld (
 
   smallworld::configure { "smallworld configuration":
     smallworld_gis => $smallworld_gis,
-    configure_user    => $owning_user,
+    configure_user => $owning_user,
   }
 
   smallworld::test { "smallworld test run":
@@ -40,7 +40,7 @@ define smallworld::install (
   exec { "install smallworld":
     command  => "${installation_source}/product/install.sh ${install_opts}",
     provider => shell,
-    creates  => "${target_dir}",
+    creates  => $target_dir,
     require => [
       File["/bin/arch"],
       Package["csh"],
@@ -126,9 +126,9 @@ class { "smallworld":
   installation_source => $mount_path,
 }
 
-Mount["${mount_path}"] -> Class["smallworld"]
+Mount[$mount_path] -> Class["smallworld"]
 
-mount { "${mount_path}":
+mount { $mount_path:
   ensure  => mounted,
   device  => "${installation_iso_file}",
   options => "loop,ro,noauto",
@@ -136,6 +136,6 @@ mount { "${mount_path}":
   require => File["${mount_path}"],
 }
 
-file { "${mount_path}":
+file { $mount_path:
   ensure => directory,
 }
