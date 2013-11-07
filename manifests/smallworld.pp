@@ -4,7 +4,7 @@ class smallworld (
   $installation_source = undef,
 ) {
 
-  $smallworld_gis = "${target_dir}/GIS42"
+  $smallworld_gis = "${target_dir}/GIS43"
 
   smallworld::install { "smallworld install":
     target_dir          => $target_dir,
@@ -74,7 +74,7 @@ define smallworld::install::cambridge_db (
 
   $answer_text = inline_template(
       "3
-      ${installation_source}/cam_db
+      ${installation_source}/cambridge_db430
       yes
       ${target_dir}
       ")
@@ -98,11 +98,16 @@ define smallworld::configure (
 
   file { "${smallworld_gis}/config/gis_aliases":
     ensure  => link,
-    target  => "magik_images/resources/base/data/gis_aliases",
+    target  => "../sw_core/config/magik_images/resources/base/data/gis_aliases",
+  }
+
+  file { "${smallworld_gis}/3rd_party_libs/Linux.x86/lib/libexpat.so.0":
+    ensure => link,
+    target => "libexpat.so.1",
   }
 
   exec { "patches font file":
-    command  => "sed -i -e 's/urw/*/' -e 's/0/*/' ${smallworld_gis}/config/font/urw_helvetica",
+    command  => "sed -i 's/urw-nimbus sans l/*-helvetica/' ${smallworld_gis}/config/font/urw_helvetica",
     provider => shell,
   }
 }
