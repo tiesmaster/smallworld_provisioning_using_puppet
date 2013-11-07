@@ -32,13 +32,18 @@ define smallworld::install (
   include smallworld::install::deps
   include smallworld::runtime::deps
 
-  $install_dir = "-targetdir ${target_dir}"
-  $install_features = "-force_os_rev -platforms local -emacs no -owner ${owning_user}"
-  $install_answer_file = "/vagrant/manifests/smallworld_install.answer_file"
-  $install_opts = "${install_features} -nolog ${install_dir} < ${install_answer_file}"
+  $target_dir_opt = "-targetdir ${target_dir}"
+  $owner_opt = "-owner ${owning_user}"
+  $emacs_opt = "-emacs no"
+  $platform_opt = "-platforms local"
+  $other_opts = "-force_os_rev -nolog"
+
+  $install_opts = "${target_dir_opt} ${owner_opt} ${emacs_opt} ${platform_opt} ${other_opts}"
+
+  $answer_file = "/vagrant/manifests/smallworld_install.answer_file"
 
   exec { "install smallworld":
-    command  => "${installation_source}/product/install.sh ${install_opts}",
+    command  => "${installation_source}/product/install.sh ${install_opts} < ${answer_file}",
     provider => shell,
     creates  => $target_dir,
     require => [
