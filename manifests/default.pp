@@ -4,16 +4,7 @@ class smallworld (
   $installation_source = undef,
 ) {
 
-# installation deps
-
-  file { "/bin/arch":
-    ensure => link,
-    target => "/usr/bin/arch",
-  }
-
-  package { "csh":
-    ensure => installed,
-  }
+  include install::deps
 
 # install smallworld
 
@@ -78,8 +69,21 @@ class smallworld (
   }
 }
 
+class smallworld::install::deps {
+
+  file { "/bin/arch":
+    ensure => link,
+    target => "/usr/bin/arch",
+  }
+
+  package { "csh":
+    ensure => installed,
+  }
+}
+
 $installation_iso_file = "/vagrant/install/CORE420_UNIX.iso"
 $mount_path = "/mnt/smallworld_install"
+
 
 class { "smallworld":
   target_dir          => "/opt/smallworld",
