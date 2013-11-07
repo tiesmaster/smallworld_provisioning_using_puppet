@@ -4,46 +4,17 @@ class smallworld (
   $installation_source = undef,
 ) {
 
-  smallworld::install { "default install":
+  $smallworld_gis = "${target_dir}/GIS42"
+
+  smallworld::install { "smallworld install":
     target_dir          => $target_dir,
     target_user         => $target_user,
     installation_source => $installation_source,
   }
 
-# configure smallworld
-
-  exec { "configure smallworld":
-    command   => "echo ${target_user} | ${target_dir}/GIS42/bin/share/gis_config -user",
-    provider  => shell,
-    require   => Exec["install smallworld"],
-  }
-
-  file { "${target_dir}/GIS42/config/gis_aliases":
-    ensure  => link,
-    target  => "${target_dir}/GIS42/config/magik_images/resources/base/data/gis_aliases",
-    require => Exec["install smallworld"],
-  }
-
-# runtime deps: sw_magik_motif
-
-  package { "dependent packages for sw_magik_motif":
-    name   => [
-      "libxaw3dxft6",
-      "libxp6",
-      "gsfonts-x11",
-    ],
-    ensure => installed,
-  }
-
-  file { "/usr/lib/libXaw3d.so.7":
-    ensure => link,
-    target => "/usr/lib/libXaw3dxft.so.6",
-  }
-
-  exec { "patches font file":
-    command  => "sed -i -e 's/urw/*/' -e 's/0/*/' ${target_dir}/GIS42/config/font/urw_helvetica",
-    provider => shell,
-    require  => Exec["install smallworld"],
+  smallworld::configure { "smallworld configuration":
+    smallworld_gis => $smallworld_gis,
+    target_user    => $target_user,
   }
 
 # tests
@@ -52,7 +23,7 @@ class smallworld (
     command   => "sudo -H -u ${target_user} sh -l -c 'gis -i gis'",
     provider  => shell,
     logoutput => true,
-    require   => File["${target_dir}/GIS42/config/gis_aliases"],
+    require   => File["${smallworld_gis}/config/gis_aliases"],
   }
 }
 
@@ -63,6 +34,7 @@ define smallworld::install (
 ) {
 
   include smallworld::install::deps
+  include smallworld::runtime::deps
 
   $install_dir = "-targetdir ${target_dir}"
   $install_features = "-force_os_rev -platforms local -emacs no -owner ${target_user}"
@@ -80,6 +52,30 @@ define smallworld::install (
   }
 }
 
+define smallworld::configure (
+  $smallworld_gis = undef,
+  $target_user = undef,
+) {
+
+  exec { "configure smallworld":
+    command   => "echo ${target_user} | ${smallworld_gis}/bin/share/gis_config -user",
+    provider  => shell,
+    require   => Exec["install smallworld"],
+  }
+
+  file { "${smallworld_gis}/config/gis_aliases":
+    ensure  => link,
+    target  => "${smallworld_gis}/config/magik_images/resources/base/data/gis_aliases",
+    require => Exec["install smallworld"],
+  }
+
+  exec { "patches font file":
+    command  => "sed -i -e 's/urw/*/' -e 's/0/*/' ${smallworld_gis}/config/font/urw_helvetica",
+    provider => shell,
+    require  => Exec["install smallworld"],
+  }
+}
+
 class smallworld::install::deps {
 
   file { "/bin/arch":
@@ -89,6 +85,23 @@ class smallworld::install::deps {
 
   package { "csh":
     ensure => installed,
+  }
+}
+
+class smallworld::runtime::deps {
+
+  package { "dependent packages for sw_magik_motif":
+    name   => [
+      "libxaw3dxft6",
+      "libxp6",
+      "gsfonts-x11",
+    ],
+    ensure => installed,
+  }
+
+  file { "/usr/lib/libXaw3d.so.7":
+    ensure => link,
+    target => "/usr/lib/libXaw3dxft.so.6",
   }
 }
 
