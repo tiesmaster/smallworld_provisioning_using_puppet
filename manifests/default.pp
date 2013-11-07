@@ -17,13 +17,9 @@ class smallworld (
     target_user    => $target_user,
   }
 
-# tests
-
-  exec { "test smallworld":
-    command   => "sudo -H -u ${target_user} sh -l -c 'gis -i gis'",
-    provider  => shell,
-    logoutput => true,
-    require   => File["${smallworld_gis}/config/gis_aliases"],
+  smallworld::test { "smallworld test run":
+    smallworld_gis => $smallworld_gis,
+    target_user    => $target_user,
   }
 }
 
@@ -74,6 +70,22 @@ define smallworld::configure (
     provider => shell,
     require  => Exec["install smallworld"],
   }
+}
+
+define smallworld::test (
+  $smallworld_gis = undef,
+  $target_user = undef,
+) {
+
+  exec { "test smallworld":
+    command   => "sudo -H -u ${target_user} sh -l -c 'gis -i gis'",
+    provider  => shell,
+    logoutput => true,
+    require   => File["${smallworld_gis}/config/gis_aliases"],
+  }
+
+# gis -i -a /opt/smallworld/cambridge_db/config/magik_images/resources/base/data/gis_aliases build_cam_db_closed
+# gis -i -a /opt/smallworld/cambridge_db/config/magik_images/resources/base/data/gis_aliases build_cam_db_closed_swaf
 }
 
 class smallworld::install::deps {
@@ -128,6 +140,3 @@ mount { "${mount_path}":
 file { "${mount_path}":
   ensure => directory,
 }
-
-# gis -i -a /opt/smallworld/cambridge_db/config/magik_images/resources/base/data/gis_aliases build_cam_db_closed
-# gis -i -a /opt/smallworld/cambridge_db/config/magik_images/resources/base/data/gis_aliases build_cam_db_closed_swaf
