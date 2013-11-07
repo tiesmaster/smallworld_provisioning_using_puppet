@@ -12,10 +12,14 @@ class smallworld (
     installation_source => $installation_source,
   }
 
+  ->
+
   smallworld::configure { "smallworld configuration":
     smallworld_gis => $smallworld_gis,
     configure_user => $owning_user,
   }
+
+  ->
 
   smallworld::test { "smallworld test run":
     smallworld_gis  => $smallworld_gis,
@@ -29,7 +33,7 @@ define smallworld::install (
   $installation_source = undef,
 ) {
 
-  include smallworld::install::deps
+  require smallworld::install::deps
   include smallworld::runtime::deps
 
   $target_dir_opt = "-targetdir ${target_dir}"
@@ -46,10 +50,6 @@ define smallworld::install (
     command  => "${installation_source}/product/install.sh ${install_opts} < ${answer_file}",
     provider => shell,
     creates  => $target_dir,
-    require => [
-      File["/bin/arch"],
-      Package["csh"],
-    ],
   }
 }
 
@@ -61,19 +61,16 @@ define smallworld::configure (
   exec { "configure smallworld":
     command   => "echo ${configure_user} | ${smallworld_gis}/bin/share/gis_config -user",
     provider  => shell,
-    require   => Exec["install smallworld"],
   }
 
   file { "${smallworld_gis}/config/gis_aliases":
     ensure  => link,
     target  => "${smallworld_gis}/config/magik_images/resources/base/data/gis_aliases",
-    require => Exec["install smallworld"],
   }
 
   exec { "patches font file":
     command  => "sed -i -e 's/urw/*/' -e 's/0/*/' ${smallworld_gis}/config/font/urw_helvetica",
     provider => shell,
-    require  => Exec["install smallworld"],
   }
 }
 
