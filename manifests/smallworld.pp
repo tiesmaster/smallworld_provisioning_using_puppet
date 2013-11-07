@@ -88,8 +88,10 @@ define smallworld::test (
   $configured_user = undef,
 ) {
 
+  $test_cmd = "gis -i swaf"
+
   exec { "test smallworld":
-    command   => "sudo -H -u ${configured_user} sh -l -c 'gis -i gis'",
+    command   => "sudo -H -u ${configured_user} sh -l -c '${test_cmd}'",
     provider  => shell,
     logoutput => true,
     require   => File["${smallworld_gis}/config/gis_aliases"],
