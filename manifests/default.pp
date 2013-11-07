@@ -1,6 +1,6 @@
 import "smallworld.pp"
 
-$installation_iso_file = "/vagrant/install/CORE420_UNIX.iso"
+$installation_iso_file = "/vagrant/install/SWCST430unix.iso"
 $mount_path = "/mnt/smallworld_install"
 
 class { "smallworld":
