@@ -1,24 +1,8 @@
 class smallworld (
   $target_dir = undef,
   $target_user = undef,
-  $installation_iso_file = undef,
+  $installation_source = undef,
 ) {
-
-  $install_source = "/mnt/smallworld_install"
-
-# setup install location
-
-  file { "${install_source}":
-    ensure => directory,
-  }
-
-  mount { "${install_source}":
-    ensure  => mounted,
-    device  => "${installation_iso_file}",
-    options => "loop,ro,noauto",
-    fstype  => "iso9660",
-    require => File["${install_source}"],
-  }
 
 # installation deps
 
@@ -39,13 +23,12 @@ class smallworld (
   $install_opts = "${install_features} -nolog ${install_dir} < ${install_answer_file}"
 
   exec { "install smallworld":
-    command  => "${install_source}/product/install.sh ${install_opts}",
+    command  => "${installation_source}/product/install.sh ${install_opts}",
     provider => shell,
     creates  => "${target_dir}",
     require => [
       File["/bin/arch"],
       Package["csh"],
-      Mount["${install_source}"],
     ],
   }
 
@@ -95,10 +78,27 @@ class smallworld (
   }
 }
 
+$installation_iso_file = "/vagrant/install/CORE420_UNIX.iso"
+$mount_path = "/mnt/smallworld_install"
+
 class { "smallworld":
-  target_dir  => "/opt/smallworld",
-  target_user => "vagrant",
-  installation_iso_file => "/vagrant/install/CORE420_UNIX.iso",
+  target_dir          => "/opt/smallworld",
+  target_user         => "vagrant",
+  installation_source => $mount_path,
+}
+
+Mount["${mount_path}"] -> Class["smallworld"]
+
+mount { "${mount_path}":
+  ensure  => mounted,
+  device  => "${installation_iso_file}",
+  options => "loop,ro,noauto",
+  fstype  => "iso9660",
+  require => File["${mount_path}"],
+}
+
+file { "${mount_path}":
+  ensure => directory,
 }
 
 # gis -i -a /opt/smallworld/cambridge_db/config/magik_images/resources/base/data/gis_aliases build_cam_db_closed
