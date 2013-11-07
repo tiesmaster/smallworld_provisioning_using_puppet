@@ -1,6 +1,6 @@
 class smallworld (
   $target_dir = undef,
-  $target_user = undef,
+  $owning_user = undef,
   $installation_source = undef,
 ) {
 
@@ -8,24 +8,24 @@ class smallworld (
 
   smallworld::install { "smallworld install":
     target_dir          => $target_dir,
-    target_user         => $target_user,
+    owning_user         => $owning_user,
     installation_source => $installation_source,
   }
 
   smallworld::configure { "smallworld configuration":
     smallworld_gis => $smallworld_gis,
-    target_user    => $target_user,
+    configure_user    => $owning_user,
   }
 
   smallworld::test { "smallworld test run":
-    smallworld_gis => $smallworld_gis,
-    target_user    => $target_user,
+    smallworld_gis  => $smallworld_gis,
+    configured_user => $owning_user,
   }
 }
 
 define smallworld::install (
   $target_dir = undef,
-  $target_user = undef,
+  $owning_user = undef,
   $installation_source = undef,
 ) {
 
@@ -33,7 +33,7 @@ define smallworld::install (
   include smallworld::runtime::deps
 
   $install_dir = "-targetdir ${target_dir}"
-  $install_features = "-force_os_rev -platforms local -emacs no -owner ${target_user}"
+  $install_features = "-force_os_rev -platforms local -emacs no -owner ${owning_user}"
   $install_answer_file = "/vagrant/manifests/smallworld_install.answer_file"
   $install_opts = "${install_features} -nolog ${install_dir} < ${install_answer_file}"
 
@@ -50,11 +50,11 @@ define smallworld::install (
 
 define smallworld::configure (
   $smallworld_gis = undef,
-  $target_user = undef,
+  $configure_user = undef,
 ) {
 
   exec { "configure smallworld":
-    command   => "echo ${target_user} | ${smallworld_gis}/bin/share/gis_config -user",
+    command   => "echo ${configure_user} | ${smallworld_gis}/bin/share/gis_config -user",
     provider  => shell,
     require   => Exec["install smallworld"],
   }
@@ -74,11 +74,11 @@ define smallworld::configure (
 
 define smallworld::test (
   $smallworld_gis = undef,
-  $target_user = undef,
+  $configured_user = undef,
 ) {
 
   exec { "test smallworld":
-    command   => "sudo -H -u ${target_user} sh -l -c 'gis -i gis'",
+    command   => "sudo -H -u ${configured_user} sh -l -c 'gis -i gis'",
     provider  => shell,
     logoutput => true,
     require   => File["${smallworld_gis}/config/gis_aliases"],
@@ -120,10 +120,9 @@ class smallworld::runtime::deps {
 $installation_iso_file = "/vagrant/install/CORE420_UNIX.iso"
 $mount_path = "/mnt/smallworld_install"
 
-
 class { "smallworld":
   target_dir          => "/opt/smallworld",
-  target_user         => "vagrant",
+  owning_user         => "vagrant",
   installation_source => $mount_path,
 }
 
