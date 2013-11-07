@@ -4,23 +4,10 @@ class smallworld (
   $installation_source = undef,
 ) {
 
-  include install::deps
-
-# install smallworld
-
-  $install_dir = "-targetdir ${target_dir}"
-  $install_features = "-force_os_rev -platforms local -emacs no -owner ${target_user}"
-  $install_answer_file = "/vagrant/manifests/smallworld_install.answer_file"
-  $install_opts = "${install_features} -nolog ${install_dir} < ${install_answer_file}"
-
-  exec { "install smallworld":
-    command  => "${installation_source}/product/install.sh ${install_opts}",
-    provider => shell,
-    creates  => "${target_dir}",
-    require => [
-      File["/bin/arch"],
-      Package["csh"],
-    ],
+  smallworld::install { "default install":
+    target_dir          => $target_dir,
+    target_user         => $target_user,
+    installation_source => $installation_source,
   }
 
 # configure smallworld
@@ -66,6 +53,30 @@ class smallworld (
     provider  => shell,
     logoutput => true,
     require   => File["${target_dir}/GIS42/config/gis_aliases"],
+  }
+}
+
+define smallworld::install (
+  $target_dir = undef,
+  $target_user = undef,
+  $installation_source = undef,
+) {
+
+  include smallworld::install::deps
+
+  $install_dir = "-targetdir ${target_dir}"
+  $install_features = "-force_os_rev -platforms local -emacs no -owner ${target_user}"
+  $install_answer_file = "/vagrant/manifests/smallworld_install.answer_file"
+  $install_opts = "${install_features} -nolog ${install_dir} < ${install_answer_file}"
+
+  exec { "install smallworld":
+    command  => "${installation_source}/product/install.sh ${install_opts}",
+    provider => shell,
+    creates  => "${target_dir}",
+    require => [
+      File["/bin/arch"],
+      Package["csh"],
+    ],
   }
 }
 
