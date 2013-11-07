@@ -44,10 +44,19 @@ define smallworld::install (
 
   $install_opts = "${target_dir_opt} ${owner_opt} ${emacs_opt} ${platform_opt} ${other_opts}"
 
-  $answer_file = "/vagrant/manifests/smallworld_install.answer_file"
+  $answer_text = inline_template(
+      "no
+      1
+      no
+      no
+      3
+      ${installation_source}/cam_db
+      yes
+      ${target_dir}/cambridge_db
+      ")
 
   exec { "install smallworld":
-    command  => "${installation_source}/product/install.sh ${install_opts} < ${answer_file}",
+    command  => "echo '${answer_text}' | ${installation_source}/product/install.sh ${install_opts}",
     provider => shell,
     creates  => $target_dir,
   }

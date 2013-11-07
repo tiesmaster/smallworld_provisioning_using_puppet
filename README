@@ -1,11 +1,5 @@
 This is a sample setup howto provision a new VM using Vagrant and setup Smallworld using Puppet.
 
-KNOWN ISSUES
-============
-
- * answer file to Smallworld installer contains full paths
-
-
 TEST COMMAND FOR BUILDING CAMBRIDGE
 ===================================
 
