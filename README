@@ -10,6 +10,4 @@ TEST COMMAND FOR BUILDING CAMBRIDGE
 TODO
 ====
 
-  add build_cam_db_closed_swaf to scripts
   split off cambridge installation from smallworld install
-  add test script for running ssh -X and opening swaf image with sw_module_dialog.open()
