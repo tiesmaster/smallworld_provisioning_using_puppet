@@ -14,6 +14,14 @@ class smallworld (
 
   ->
 
+  smallworld::install::cambridge_db { "smallworld install cambridge_db":
+    smallworld_gis      => $smallworld_gis,
+    target_dir          => "${target_dir}/cambridge_db",
+    installation_source => $installation_source,
+  }
+
+  ->
+
   smallworld::configure { "smallworld configuration":
     smallworld_gis => $smallworld_gis,
     configure_user => $owning_user,
@@ -44,19 +52,35 @@ define smallworld::install (
 
   $install_opts = "${target_dir_opt} ${owner_opt} ${emacs_opt} ${platform_opt} ${other_opts}"
 
-  $answer_text = inline_template(
+  $answer_text =
       "no
       1
       no
       no
-      3
-      ${installation_source}/cam_db
-      yes
-      ${target_dir}/cambridge_db
-      ")
+      "
 
   exec { "install smallworld":
     command  => "echo '${answer_text}' | ${installation_source}/product/install.sh ${install_opts}",
+    provider => shell,
+    creates  => $target_dir,
+  }
+}
+
+define smallworld::install::cambridge_db (
+  $smallworld_gis = undef,
+  $target_dir = undef,
+  $installation_source = undef,
+) {
+
+  $answer_text = inline_template(
+      "3
+      ${installation_source}/cam_db
+      yes
+      ${target_dir}
+      ")
+
+  exec { "install smallworld cambridge_db":
+    command  => "echo '${answer_text}' | ${smallworld_gis}/bin/share/gis_config",
     provider => shell,
     creates  => $target_dir,
   }

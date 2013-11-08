@@ -5,9 +5,3 @@ TEST COMMAND FOR BUILDING CAMBRIDGE
 
 # gis -i -a /opt/smallworld/cambridge_db/config/magik_images/resources/base/data/gis_aliases build_cam_db_closed
 # gis -i -a /opt/smallworld/cambridge_db/config/magik_images/resources/base/data/gis_aliases build_cam_db_closed_swaf
-
-
-TODO
-====
-
-  split off cambridge installation from smallworld install
