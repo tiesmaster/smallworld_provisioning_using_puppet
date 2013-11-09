@@ -1,3 +1,4 @@
 #!/bin/bash
 
-rm -rf build
+script_dir=$(dirname $0)
+rm -rf ${script_dir}/build
