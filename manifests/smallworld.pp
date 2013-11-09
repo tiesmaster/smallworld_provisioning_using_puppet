@@ -2,36 +2,46 @@ class smallworld (
   $target_dir = undef,
   $owning_user = undef,
   $installation_source = undef,
+  $version = undef,
 ) {
 
-  $smallworld_gis = "${target_dir}/GIS43"
+  $target_dir_suffix = $version ? {
+    "v4.2" => "GIS42",
+    "v4.3" => "GIS43",
+  }
 
-  smallworld::install { "smallworld install":
+  $smallworld_gis = "${target_dir}/${target_dir_suffix}"
+
+  smallworld::install { $version:
     target_dir          => $target_dir,
     owning_user         => $owning_user,
     installation_source => $installation_source,
+    version            => $version,
   }
 
   ->
 
-  smallworld::install::cambridge_db { "smallworld install cambridge_db":
+  smallworld::install::cambridge_db { $version:
     smallworld_gis      => $smallworld_gis,
     target_dir          => "${target_dir}/cambridge_db",
     installation_source => $installation_source,
+    version             => $version,
   }
 
   ->
 
-  smallworld::configure { "smallworld configuration":
+  smallworld::configure { $version:
     smallworld_gis => $smallworld_gis,
     configure_user => $owning_user,
+    version        => $version,
   }
 
   ->
 
-  smallworld::test { "smallworld test run":
+  smallworld::test { $version:
     smallworld_gis  => $smallworld_gis,
     configured_user => $owning_user,
+    version         => $version,
   }
 }
 
@@ -39,6 +49,7 @@ define smallworld::install (
   $target_dir = undef,
   $owning_user = undef,
   $installation_source = undef,
+  $version = undef,
 ) {
 
   require smallworld::install::deps
@@ -59,7 +70,7 @@ define smallworld::install (
       no
       "
 
-  exec { "install smallworld":
+  exec { "install smallworld ${version}":
     command  => "echo '${answer_text}' | ${installation_source}/product/install.sh ${install_opts}",
     provider => shell,
     creates  => $target_dir,
@@ -70,16 +81,22 @@ define smallworld::install::cambridge_db (
   $smallworld_gis = undef,
   $target_dir = undef,
   $installation_source = undef,
+  $version = undef,
 ) {
+
+  $cambridge_db_install_source = $version ? {
+    "v4.2" => "cam_db",
+    "v4.3" => "cambridge_db430",
+  }
 
   $answer_text = inline_template(
       "3
-      ${installation_source}/cambridge_db430
+      ${installation_source}/${cambridge_db_install_source}
       yes
       ${target_dir}
       ")
 
-  exec { "install smallworld cambridge_db":
+  exec { "install smallworld cambridge_db ${version}":
     command  => "echo '${answer_text}' | ${smallworld_gis}/bin/share/gis_config",
     provider => shell,
     creates  => $target_dir,
@@ -89,25 +106,38 @@ define smallworld::install::cambridge_db (
 define smallworld::configure (
   $smallworld_gis = undef,
   $configure_user = undef,
+  $version = undef,
 ) {
 
-  exec { "configure smallworld":
+  exec { "configure smallworld ${version}":
     command   => "echo ${configure_user} | ${smallworld_gis}/bin/share/gis_config -user",
     provider  => shell,
   }
 
+  $gis_aliases_symlink_target = $version ? {
+    "v4.2" => "magik_images/resources/base/data/gis_aliases",
+    "v4.3" => "../sw_core/config/magik_images/resources/base/data/gis_aliases",
+  }
+
   file { "${smallworld_gis}/config/gis_aliases":
     ensure  => link,
-    target  => "../sw_core/config/magik_images/resources/base/data/gis_aliases",
+    target  => $gis_aliases_symlink_target,
   }
 
-  file { "${smallworld_gis}/3rd_party_libs/Linux.x86/lib/libexpat.so.0":
-    ensure => link,
-    target => "libexpat.so.1",
+  if $version == "v4.3" {
+    file { "${smallworld_gis}/3rd_party_libs/Linux.x86/lib/libexpat.so.0":
+      ensure => link,
+      target => "libexpat.so.1",
+    }
   }
 
-  exec { "patches font file":
-    command  => "sed -i 's/urw-nimbus sans l/*-helvetica/' ${smallworld_gis}/config/font/urw_helvetica",
+  $font_sed_patch = $version ? {
+    "v4.2" => "-e 's/urw/*/' -e 's/0/*/'",
+    "v4.3" => "'s/urw-nimbus sans l/*-helvetica/'",
+  }
+
+  exec { "patches font file for smallworld ${version}":
+    command  => "sed -i ${font_sed_patch} ${smallworld_gis}/config/font/urw_helvetica",
     provider => shell,
   }
 }
@@ -115,11 +145,12 @@ define smallworld::configure (
 define smallworld::test (
   $smallworld_gis = undef,
   $configured_user = undef,
+  $version = undef,
 ) {
 
   $test_cmd = "gis -i swaf"
 
-  exec { "test smallworld":
+  exec { "test smallworld ${version}":
     command   => "sudo -H -u ${configured_user} sh -l -c '${test_cmd}'",
     provider  => shell,
     logoutput => true,
