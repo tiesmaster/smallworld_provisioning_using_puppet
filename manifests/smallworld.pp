@@ -16,7 +16,7 @@ class smallworld (
     target_dir          => $target_dir,
     owning_user         => $owning_user,
     installation_source => $installation_source,
-    version            => $version,
+    version             => $version,
   }
 
   ->
