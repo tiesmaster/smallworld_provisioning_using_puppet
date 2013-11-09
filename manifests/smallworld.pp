@@ -98,7 +98,7 @@ define smallworld::configure (
 
   file { "${smallworld_gis}/config/gis_aliases":
     ensure  => link,
-    target  => "${smallworld_gis}/config/magik_images/resources/base/data/gis_aliases",
+    target  => "magik_images/resources/base/data/gis_aliases",
   }
 
   exec { "patches font file":
@@ -147,6 +147,6 @@ class smallworld::runtime::deps {
 
   file { "/usr/lib/libXaw3d.so.7":
     ensure => link,
-    target => "/usr/lib/libXaw3dxft.so.6",
+    target => "libXaw3dxft.so.6",
   }
 }
