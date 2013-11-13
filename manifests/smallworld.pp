@@ -197,11 +197,6 @@ define smallworld::configure (
     source  => "${module_dir}/files/.emacs",
     require => Exec["configure smallworld ${version}"],
   }
-
-  file { "${home}/gis_aliases":
-    content => template("${module_dir}/templates/gis_aliases.erb"),
-    require => Exec["configure smallworld ${version}"],
-  }
 }
 
 define smallworld::test (
