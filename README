@@ -1,5 +1,23 @@
 This is a sample setup howto provision a new VM using Vagrant and setup Smallworld using Puppet.
 
+KNOWN ISSUES
+============
+
+ * font file for 4.3 is reverted back to the one of 4.2, because the "nimbus sans l" font is unavailable;
+ * answer file for installation doesn't really use an inline template, since
+     it's not using ERB templating, but rather just the variables;
+
+TODO
+====
+
+ * install swmfs
+ * add questions as comments in the answer file for documentation;
+ * support installing multiple versions;
+ * find out what to do to build cambridge open (patch /etc/mtab??, to prevent ext4 bug in vmds??);
+ * fix deps in class smallworld:
+      smallworld::install -> smallworld::install::cambridge_db -> smallworld::install::emacs -> etc.
+      this is because the install shouldn't fail when cambridge fails to install;
+
 TEST COMMAND FOR BUILDING CAMBRIDGE
 ===================================
 
