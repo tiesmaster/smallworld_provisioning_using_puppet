@@ -1,0 +1,10 @@
+
+emacs:
+	EMACSROOT	= <%= @emacs_install_dir %>
+	title		= GNU Emacs 23.3
+	program		= emacs
+	product		= emacs
+	EMACSPATH	= /usr/bin
+	EMACSLOADPATH	= %EMACSROOT%/site-lisp;%EMACSROOT%/lisp;%EMACSROOT%/leim
+	PATH		= %PATH%;%EMACSROOT%/bin/%HOST_OS%.%HOST_ARCH%
+

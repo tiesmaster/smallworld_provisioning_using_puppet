@@ -1,11 +1,13 @@
 import "smallworld.pp"
 
+$module_dir = "/vagrant"
+
 /* $wanted_smallworld_version = "v4.2"*/
 $wanted_smallworld_version = "v4.3"
 
 $installation_iso_file = $wanted_smallworld_version ? {
-  "v4.2" => "/vagrant/install/CORE420_UNIX.iso",
-  "v4.3" => "/vagrant/install/SWCST430unix.iso",
+  "v4.2" => "${module_dir}/install/CORE420_UNIX.iso",
+  "v4.3" => "${module_dir}/install/SWCST430unix.iso",
 }
 $mount_path = "/mnt/smallworld_install"
 
@@ -14,6 +16,7 @@ class { "smallworld":
   owning_user         => "vagrant",
   installation_source => $mount_path,
   version             => $wanted_smallworld_version,
+  module_dir          => $module_dir,
 }
 
 Mount[$mount_path] -> Class["smallworld"]

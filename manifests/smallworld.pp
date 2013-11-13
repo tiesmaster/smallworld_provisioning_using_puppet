@@ -3,6 +3,7 @@ class smallworld (
   $owning_user = undef,
   $installation_source = undef,
   $version = undef,
+  $module_dir = undef,
 ) {
 
   $target_dir_suffix = $version ? {
@@ -11,6 +12,8 @@ class smallworld (
   }
 
   $smallworld_gis = "${target_dir}/${target_dir_suffix}"
+
+  $emacs_install_dir = "${target_dir}/emacs"
 
   smallworld::install { $version:
     target_dir          => $target_dir,
@@ -30,10 +33,21 @@ class smallworld (
 
   ->
 
+  smallworld::install::emacs { $version:
+    smallworld_gis      => $smallworld_gis,
+    target_dir          => $emacs_install_dir,
+    installation_source => $installation_source,
+    version             => $version,
+  }
+
+  ->
+
   smallworld::configure { $version:
-    smallworld_gis => $smallworld_gis,
-    configure_user => $owning_user,
-    version        => $version,
+    smallworld_gis    => $smallworld_gis,
+    configure_user    => $owning_user,
+    version           => $version,
+    module_dir        => $module_dir,
+    emacs_install_dir => $emacs_install_dir,
   }
 
   ->
@@ -103,11 +117,49 @@ define smallworld::install::cambridge_db (
   }
 }
 
+define smallworld::install::emacs (
+  $smallworld_gis = undef,
+  $target_dir = undef,
+  $installation_source = undef,
+  $version = undef,
+) {
+
+  include apt-get::update
+
+  package { "emacs23":
+  }
+
+  $emacs_install_source = "emacs2331"
+
+
+  $answer_text = inline_template(
+      "3
+      ${installation_source}/${emacs_install_source}
+      yes
+      ${target_dir}
+      ")
+
+  if $version == "v4.3" {
+    exec { "install smallworld emacs ${version}":
+      command  => "echo '${answer_text}' | ${smallworld_gis}/bin/share/gis_config",
+      provider => shell,
+      creates  => $target_dir,
+    }
+  } else {
+    notify { "install of emacs is not supported at ${version}": }
+  }
+
+}
+
 define smallworld::configure (
   $smallworld_gis = undef,
   $configure_user = undef,
   $version = undef,
+  $module_dir = undef,
+  $emacs_install_dir = undef,
 ) {
+
+  $home = "/home/${configure_user}"
 
   exec { "configure smallworld ${version}":
     command   => "echo ${configure_user} | ${smallworld_gis}/bin/share/gis_config -user",
@@ -139,6 +191,16 @@ define smallworld::configure (
   exec { "patches font file for smallworld ${version}":
     command  => "sed -i ${font_sed_patch} ${smallworld_gis}/config/font/urw_helvetica",
     provider => shell,
+  }
+
+  file { "${home}/.emacs":
+    source  => "${module_dir}/files/.emacs",
+    require => Exec["configure smallworld ${version}"],
+  }
+
+  file { "${home}/gis_aliases":
+    content => template("${module_dir}/templates/gis_aliases.erb"),
+    require => Exec["configure smallworld ${version}"],
   }
 }
 
@@ -184,5 +246,10 @@ class smallworld::runtime::deps {
   file { "/usr/lib/libXaw3d.so.7":
     ensure => link,
     target => "libXaw3dxft.so.6",
+  }
+}
+
+class apt-get::update {
+  exec { "/usr/bin/apt-get update":
   }
 }
