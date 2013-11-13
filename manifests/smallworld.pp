@@ -197,6 +197,11 @@ define smallworld::configure (
     source  => "${module_dir}/files/.emacs",
     require => Exec["configure smallworld ${version}"],
   }
+
+  exec { 'fixup $LD_LIBRARY_PATH':
+    command => "/bin/echo unset LD_LIBRARY_PATH >> ${home}/.profile",
+    require => Exec["configure smallworld ${version}"],
+  }
 }
 
 define smallworld::test (
